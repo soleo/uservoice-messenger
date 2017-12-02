@@ -1,6 +1,5 @@
-# peapod-messenger
+# Peapod Messenger
 Deliver different kinds of messages to related slack channels
-
 
 ### Requirements
 
