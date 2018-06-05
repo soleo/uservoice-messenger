@@ -20,7 +20,11 @@ exports.userVoiceWebhook = functions.https.onRequest((req, res) => {
     message = userVoiceObject.ticket.created_by.name + ' said: '+ userVoiceObject.ticket.messages[0].body;
   }
 
-  postToSlack(message).then(() => {
+  postToSlack(message,
+    userVoiceObject.ticket.created_by.name,
+    userVoiceObject.ticket.created_by.avatar_url,
+    userVoiceObject.ticket.created_by.traits.type,
+    userVoiceObject.ticket.messages[0].referrer).then(() => {
     res.end();
   }).catch(error => {
     console.error(error);
@@ -32,12 +36,32 @@ exports.userVoiceWebhook = functions.https.onRequest((req, res) => {
 /**
  * Post a message to Slack about the new GitHub commit.
  */
-function postToSlack(message) {
+function postToSlack(message, authorName, authorIconURL, userAgent, referrer) {
   return rp({
     method: 'POST',
     uri: functions.config().slack.webhook_url,
     body: {
-      text: `${message}`
+        attachments: [
+        {
+            "color": "#577926",
+            "pretext": message,
+            "author_name": authorName,
+            "author_link": authorIconURL,
+            "author_icon": authorIconURL,
+            "fields": [
+                {
+                    "title": "User Agent",
+                    "value": userAgent,
+                    "short": false
+                },
+                {
+                    "title": "Referrer",
+                    "value": referrer,
+                    "short": false
+                }
+            ]
+        }
+       ]
     },
     json: true
   });
