@@ -8,9 +8,8 @@ const rp = require('request-promise');
  * Slack.
  */
 exports.userVoiceWebhook = functions.https.onRequest((req, res) => {
-
   const data = req.body.data;
-
+  console.log('{ data: '+ data +' }');
   const userVoiceObject = JSON.parse(data);
   let message = '';
   if(!!userVoiceObject.message) {
