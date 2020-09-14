@@ -1,4 +1,4 @@
-# Peapod Messenger
+# User Voice Messenger
 Deliver different kinds of messages to related slack channels
 
 ### Requirements
