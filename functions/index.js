@@ -49,9 +49,9 @@ function postToSlack(message, authorName, authorIconURL, userAgent, referrer, ot
                 }];
 
   if(otherFields.length > 0) {
-        otherFields.forEach(function(customFeild) {
+        otherFields.forEach(function(customField) {
             fields.push({
-                'title': customFeild.key,
+                'title': customField.key,
                 'value': customField.value,
                 'short': false
             });
