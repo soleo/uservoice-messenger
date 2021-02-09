@@ -9,12 +9,14 @@
     "logs": "firebase functions:log"
   },
   "dependencies": {
-    "firebase-admin": "~5.4.2",
-    "firebase-functions": "^0.7.1",
-    "request": "^2.80.0",
-    "request-promise": "^4.1.1",
+    "firebase-admin": "^9.4.2",
+    "firebase-functions": "^3.13.1",
+    "request": "^2.88.2",
+    "request-promise": "^4.2.6",
     "secure-compare": "^3.0.1"
   },
-  "engines": {"node": "10"},
+  "engines": {
+    "node": "10"
+  },
   "private": true
 }
