@@ -15,5 +15,6 @@
     "request-promise": "^4.1.1",
     "secure-compare": "^3.0.1"
   },
+  "engines": {"node": "10"},
   "private": true
 }
