@@ -8,26 +8,23 @@ const rp = require('request-promise');
  * Slack.
  */
 exports.userVoiceWebhook = functions.https.onRequest((req, res) => {
-  const data = req.body.data;
-  console.log('{ data: '+ data +' }');
-  const userVoiceObject = JSON.parse(data);
-  let message = '';
-  if(!!userVoiceObject.message) {
-    message = userVoiceObject.message;
-  }
+  functions.logger.log(req.body);
+  const uservoice = JSON.parse(req.body);
 
-  if(!!userVoiceObject.ticket && !!userVoiceObject.ticket.created_by && !!userVoiceObject.ticket.created_by.name) {
-    message = userVoiceObject.ticket.created_by.name + ' said: '+ userVoiceObject.ticket.messages[0].body;
+  let message = '';
+
+  if(uservoice?.ticket?.created_by?.name) {
+    message = uservoice.ticket.created_by.name + ' said: '+ uservoice.ticket?.messages[0]?.body;
   }
   postToSlack(message,
-    userVoiceObject.ticket.created_by.name,
-    userVoiceObject.ticket.created_by.avatar_url,
-    userVoiceObject.ticket.created_by.traits.type,
-    userVoiceObject.ticket.messages[0].referrer,
-    userVoiceObject.ticket.custom_fields).then(() => {
+    uservoice?.ticket?.created_by?.name,
+    uservoice?.ticket?.created_by?.avatar_url,
+    uservoice?.ticket?.created_by?.traits?.type,
+    uservoice?.ticket?.messages[0]?.referrer,
+    uservoice?.ticket?.custom_fields).then(() => {
     res.end();
   }).catch(error => {
-    console.error(error);
+    functions.logger.error(error);
     res.status(500).send('Something went wrong while posting the message to Slack.');
   });
 
@@ -47,15 +44,37 @@ function postToSlack(message, authorName, authorIconURL, userAgent, referrer, ot
                     "value": referrer,
                     "short": false
                 }];
-
-  if(otherFields.length > 0) {
+  var isBusinessUser = false
+  if(otherFields && otherFields.length > 0) {
         otherFields.forEach(function(customField) {
             fields.push({
                 'title': customField.key,
                 'value': customField.value,
                 'short': false
             });
+            if (customField.key === 'customerType' && customField.value === 'M') {
+                isBusinessUser = true;
+            }
         });
+  }
+  if (isBusinessUser) {
+      rp({
+        method: 'POST',
+        uri: functions.config().slack.webhook_b2b_url,
+        body: {
+            attachments: [
+            {
+                "color": "#577926",
+                "pretext": message,
+                "author_name": authorName,
+                "author_link": authorIconURL,
+                "author_icon": authorIconURL,
+                "fields": fields
+            }
+           ]
+        },
+        json: true
+      });
   }
   return rp({
     method: 'POST',
