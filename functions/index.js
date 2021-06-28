@@ -9,8 +9,7 @@ const rp = require('request-promise');
  */
 exports.userVoiceWebhook = functions.https.onRequest((req, res) => {
   functions.logger.log(req.body);
-  const uservoice = JSON.parse(req.body);
-
+  const uservoice = JSON.parse(req.body.data);
   let message = '';
 
   if(uservoice?.ticket?.created_by?.name) {
